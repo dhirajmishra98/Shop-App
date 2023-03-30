@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/providers/product.dart';
 import 'package:shop_app/screens/product_details_screen.dart';
 
@@ -21,6 +22,7 @@ class ProductItem extends StatelessWidget {
         listen:
             false); //this rebuilds each time anything changes to our data on screen,
     //we can improve , make listen to false and then only change particular widget changing through Consumer
+    final cart = Provider.of<Cart>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -46,7 +48,9 @@ class ProductItem extends StatelessWidget {
           trailing: IconButton(
             icon: const Icon(Icons.shopping_cart),
             color: Theme.of(context).colorScheme.secondary,
-            onPressed: () {},
+            onPressed: () {
+              cart.addItems(product.id, product.title, product.price);
+            },
           ),
         ),
         child: GestureDetector(
