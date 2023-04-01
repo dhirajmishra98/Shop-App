@@ -60,6 +60,22 @@ class ProductsProvider with ChangeNotifier {
 
     _items.add(newProduct);
     // _items.insert(0, newProduct); //add product at top (at starting)
-    ChangeNotifier();
+    // ChangeNotifier();
+    notifyListeners();
+  }
+
+  void updateProduct(String id, Product newProduct) {
+    final productIndex = _items.indexWhere((prod) => prod.id == id);
+    if (productIndex >= 0) {
+      _items[productIndex] = newProduct;
+      notifyListeners();
+    } else {
+      //Cand be implemented as need
+    }
+  }
+
+  void removeProduct(String id) {
+    _items.removeWhere((element) => element.id == id);
+    notifyListeners();
   }
 }
