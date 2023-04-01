@@ -1,8 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import './product.dart';
 
 class ProductsProvider with ChangeNotifier {
-  final List<Product> _items = [
+  List<Product> _items = [
     Product(
       id: 'p1',
       title: 'Red Shirt',
@@ -49,24 +53,104 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((prod) => prod.id == id);
   }
 
-  void addProduct(Product product) {
-    // _items.add(value);
-    Product newProduct = Product(
-        id: DateTime.now().toString(),
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl);
+  Future<void> addProduct(Product product) async {
+    var url = Uri.https(
+        'shop-app-d2062-default-rtdb.firebaseio.com', '/products.json');
+    /* /products.json is added in original url, this generates a folder named products in firebase only*/
+    try {
+      final response = await http.post(url,
+          body: json.encode({
+            'title': product.title,
+            'description': product.description,
+            'price': product.price,
+            'imageUrl': product.imageUrl,
+            'isFavourite': product.isFavourite,
+          }));
 
-    _items.add(newProduct);
-    // _items.insert(0, newProduct); //add product at top (at starting)
-    // ChangeNotifier();
-    notifyListeners();
+      Product newProduct = Product(
+          id: json.decode(response.body)['name'],
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
+
+      _items.add(newProduct);
+      // _items.insert(0, newProduct); //add product at top (at starting)
+      notifyListeners();
+    } catch (error) {
+      rethrow;
+    }
   }
 
-  void updateProduct(String id, Product newProduct) {
+/*
+//Another way of using Futures
+  Future<void> addProduct(Product product) {
+    var url = Uri.https(
+        'shop-app-d2062-default-rtdb.firebaseio.com', '/products.json');
+    /* /products.json is added in original url, this generates a folder named products in firebase only*/
+    return http
+        .post(url,
+            body: json.encode({
+              'title': product.title,
+              'description': product.description,
+              'price': product.price,
+              'imageUrl': product.imageUrl,
+              'isFavourite': product.isFavourite,
+            }))
+        .then((response) {
+      Product newProduct = Product(
+          id: json.decode(response.body)['name'],
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
+
+      _items.add(newProduct);
+      // _items.insert(0, newProduct); //add product at top (at starting)
+      // ChangeNotifier();
+      notifyListeners();
+    }).catchError((error) {
+      throw error;
+    });
+  }
+  */
+
+  Future<void> fetchAndSetProducts() async {
+    Uri url = Uri.parse(
+        'https://shop-app-d2062-default-rtdb.firebaseio.com/products.json');
+
+    try {
+      final response = await http.get(url);
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      final List<Product> loadedProduct = [];
+      extractedData.forEach((prodId, prod) {
+        loadedProduct.add(Product(
+            id: prodId,
+            title: prod['title'],
+            description: prod['description'],
+            price: prod['price'],
+            imageUrl: prod['imageUrl']));
+      });
+      _items = loadedProduct;
+      notifyListeners();
+    } catch (error) {
+      rethrow; // or throw error
+    }
+  }
+
+  Future<void> updateProduct(String id, Product newProduct) async {
     final productIndex = _items.indexWhere((prod) => prod.id == id);
     if (productIndex >= 0) {
+      Uri url = Uri.parse(
+          'https://shop-app-d2062-default-rtdb.firebaseio.com/products/$id.json');
+
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'price': newProduct.price,
+            'imageUrl': newProduct.imageUrl,
+          }));
       _items[productIndex] = newProduct;
       notifyListeners();
     } else {
@@ -74,8 +158,25 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void removeProduct(String id) {
+//optimistic updating approach
+  Future<void> removeProduct(String id) async {
+    Uri url = Uri.parse(
+        'https://shop-app-d2062-default-rtdb.firebaseio.com/products/$id.json');
+    final existingProductIndex =
+        _items.indexWhere((element) => element.id == id);
+    Product? existingProduct = _items[existingProductIndex];
+
     _items.removeWhere((element) => element.id == id);
     notifyListeners();
+
+    final response = await http.delete(url);
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex,
+          existingProduct); //rolling back if delete doesnot succedd
+      notifyListeners();
+      throw const HttpException('Cannot delete product');
+    }
+    existingProduct = null;
   }
+
 }

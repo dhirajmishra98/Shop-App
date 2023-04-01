@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/products_provider.dart';
 
 import '/screens/cart_screen.dart';
 import '../widgets/app_drawer.dart';
@@ -21,6 +22,36 @@ class ProductsOverViewScreen extends StatefulWidget {
 
 class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
   bool _isFavs = false;
+  bool _isInit = true;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    // Provider.of<ProductsProvider>(context).fetchAndSetProducts(); //Wont work
+
+    //this works and one of the method to run context in initstate
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+    // });
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    //this is another method to run context..it runs after init state and before build state
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +95,7 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
           ),
         ],
       ),
-      body: ProductGrid(_isFavs),
+      body: _isLoading ? Center(child: CircularProgressIndicator(),) : ProductGrid(_isFavs),
       drawer: AppDrawer(),
     );
   }

@@ -10,6 +10,11 @@ class UserProductsScreen extends StatelessWidget {
   static const String routeName = '/UserProductScreen';
   const UserProductsScreen({super.key});
 
+  Future<void> _refreshProducts(BuildContext context) async {
+    await Provider.of<ProductsProvider>(context, listen: false)
+        .fetchAndSetProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final productItem = Provider.of<ProductsProvider>(context);
@@ -21,20 +26,26 @@ class UserProductsScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushNamed(context, EditProductScreen.routeName);
               },
-              icon:const Icon(Icons.add)),
+              icon: const Icon(Icons.add)),
         ],
       ),
       drawer: const AppDrawer(),
-      body: ListView.builder(
-        itemCount: productItem.items.length,
-        itemBuilder: (context, index) => Column(
-          children: [
-            UserProductItem(
-              id:productItem.items[index].id ,
-                title: productItem.items[index].title,
-                imageUrl: productItem.items[index].imageUrl),
-            Divider(),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: productItem.items.length,
+            itemBuilder: (context, index) => Column(
+              children: [
+                UserProductItem(
+                    id: productItem.items[index].id,
+                    title: productItem.items[index].title,
+                    imageUrl: productItem.items[index].imageUrl),
+                Divider(),
+              ],
+            ),
+          ),
         ),
       ),
     );

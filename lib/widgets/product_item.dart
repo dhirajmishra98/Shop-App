@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:shop_app/providers/cart.dart';
 import 'package:shop_app/providers/product.dart';
+import 'package:shop_app/providers/products_provider.dart';
 import 'package:shop_app/screens/product_details_screen.dart';
 
 class ProductItem extends StatelessWidget {
@@ -50,7 +51,8 @@ class ProductItem extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
             onPressed: () {
               cart.addItems(product.id, product.title, product.price);
-              ScaffoldMessenger.of(context).hideCurrentSnackBar(); //hide current snackbar
+              ScaffoldMessenger.of(context)
+                  .hideCurrentSnackBar(); //hide current snackbar
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: const Text('Item added to Cart!'),
