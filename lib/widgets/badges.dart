@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 class Badges extends StatelessWidget {
   const Badges({
+    super.key,
     required this.child,
     required this.value,
-    this.color=Colors.lightBlue,
+    this.color = Colors.lightBlue,
   });
 
   final Widget child;
@@ -21,20 +22,21 @@ class Badges extends StatelessWidget {
           right: 8,
           top: 8,
           child: Container(
-            padding:const EdgeInsets.all(2.0),
+            padding: const EdgeInsets.all(2.0),
             // color: Theme.of(context).accentColor,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10.0),
-              color: color != null ? color : Theme.of(context).accentColor,
+              color:
+                  color != null ? color : Theme.of(context).colorScheme.primary,
             ),
-            constraints:const BoxConstraints(
+            constraints: const BoxConstraints(
               minWidth: 16,
               minHeight: 16,
             ),
             child: Text(
               value,
               textAlign: TextAlign.center,
-              style:const TextStyle(
+              style: const TextStyle(
                 fontSize: 10,
               ),
             ),

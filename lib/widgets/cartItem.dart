@@ -8,8 +8,8 @@ class CartItem extends StatelessWidget {
   final double price;
   final String title;
   final int quantity;
-  CartItem(
-      {required this.productId,
+  const CartItem(
+      {super.key, required this.productId,
       required this.id,
       required this.title,
       required this.price,
@@ -21,14 +21,14 @@ class CartItem extends StatelessWidget {
       key: ValueKey(id),
       background: Container(
         color: Theme.of(context).colorScheme.error,
-        child: Icon(
+        padding: const EdgeInsets.only(right: 10),
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        alignment: Alignment.centerRight,
+        child: const Icon(
           Icons.delete,
           color: Colors.white,
           size: 40,
         ),
-        padding: EdgeInsets.only(right: 10),
-        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-        alignment: Alignment.centerRight,
       ),
       direction: DismissDirection.endToStart,
       onDismissed: (direction) {
@@ -56,9 +56,9 @@ class CartItem extends StatelessWidget {
         );
       },
       child: Card(
-        margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: const EdgeInsets.all(8),
           child: ListTile(
             leading: CircleAvatar(
               child: FittedBox(child: Text('\$$price')),

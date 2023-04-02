@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/products_provider.dart';
 
+import '../providers/products_provider.dart';
 import '/screens/cart_screen.dart';
 import '../widgets/app_drawer.dart';
 import '../widgets/badges.dart';
@@ -14,7 +14,7 @@ enum FilterOptions {
 }
 
 class ProductsOverViewScreen extends StatefulWidget {
-  ProductsOverViewScreen({super.key});
+  const ProductsOverViewScreen({super.key});
 
   @override
   State<ProductsOverViewScreen> createState() => _ProductsOverViewScreenState();
@@ -95,8 +95,8 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
           ),
         ],
       ),
-      body: _isLoading ? Center(child: CircularProgressIndicator(),) : ProductGrid(_isFavs),
-      drawer: AppDrawer(),
+      body: _isLoading ? const Center(child: CircularProgressIndicator(),) : ProductGrid(_isFavs),
+      drawer: const AppDrawer(),
     );
   }
 }
