@@ -1,8 +1,9 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:http/http.dart' as http;
+
 import './product.dart';
 
 class ProductsProvider with ChangeNotifier {
@@ -122,6 +123,7 @@ class ProductsProvider with ChangeNotifier {
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) return;
       final List<Product> loadedProduct = [];
       extractedData.forEach((prodId, prod) {
         loadedProduct.add(Product(
@@ -178,5 +180,4 @@ class ProductsProvider with ChangeNotifier {
     }
     existingProduct = null;
   }
-
 }
