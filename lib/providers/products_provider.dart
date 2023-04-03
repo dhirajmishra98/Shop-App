@@ -42,6 +42,9 @@ class ProductsProvider with ChangeNotifier {
     ),
   ];
 
+  final String authToken;
+  ProductsProvider(this.authToken, this._items);
+
   List<Product> get items {
     return [..._items]; //return copy of orginal _items object
   }
@@ -118,7 +121,7 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> fetchAndSetProducts() async {
     Uri url = Uri.parse(
-        'https://shop-app-d2062-default-rtdb.firebaseio.com/products.json');
+        'https://shop-app-d2062-default-rtdb.firebaseio.com/products.json?auth=$authToken');
 
     try {
       final response = await http.get(url);
