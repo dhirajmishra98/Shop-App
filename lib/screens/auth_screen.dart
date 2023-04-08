@@ -256,7 +256,7 @@ class _AuthCardState extends State<AuthCard> {
                 keyboardType: TextInputType.visiblePassword,
                 obscureText: true,
                 validator: (value) {
-                  if (value!.length < 8) {
+                  if (value!.length < 4) {
                     return "password too short";
                   }
                   return null;

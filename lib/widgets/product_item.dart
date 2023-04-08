@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/auth.dart';
 
 import '../providers/cart.dart';
 import '../providers/product.dart';
@@ -25,6 +26,7 @@ class ProductItem extends StatelessWidget {
             false); //this rebuilds each time anything changes to our data on screen,
     //we can improve , make listen to false and then only change particular widget changing through Consumer
     final cart = Provider.of<Cart>(context, listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     return ClipRRect(
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
@@ -38,7 +40,7 @@ class ProductItem extends StatelessWidget {
                   : Icons.favorite_outline),
               color: Theme.of(context).colorScheme.secondary,
               onPressed: () {
-                product.toggleFavoriteStatus();
+                product.toggleFavoriteStatus(authData.token!, authData.userId!);
               },
             ),
             // child: Text('Never changes !'), //this child is from builder of consumer , it will not change during consumer rebuilds useful for labels which doesnt changes

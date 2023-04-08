@@ -101,7 +101,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         await showDialog<void>(
             context: context,
             builder: (ctx) => AlertDialog(
-                  title: const Text('An error Occured'),
+                  title: const Text('An error Occured!'),
                   content: const Text('Something went wrong'),
                   actions: [
                     TextButton(

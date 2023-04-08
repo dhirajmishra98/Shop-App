@@ -95,7 +95,11 @@ class _ProductsOverViewScreenState extends State<ProductsOverViewScreen> {
           ),
         ],
       ),
-      body: _isLoading ? const Center(child: CircularProgressIndicator(),) : ProductGrid(_isFavs),
+      body: _isLoading
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductGrid(_isFavs),
       drawer: const AppDrawer(),
     );
   }

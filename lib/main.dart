@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/auth.dart';
-import 'package:shop_app/screens/auth_screen.dart';
-import 'package:shop_app/screens/products_overview_screen.dart';
 
+import '../screens/splash_screen.dart';
+import '../providers/auth.dart';
+import '../screens/auth_screen.dart';
+import '../screens/products_overview_screen.dart';
 import '../providers/orders.dart';
 import '../screens/cart_screen.dart';
 import '../screens/edit_product_screen.dart';
@@ -29,14 +30,21 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider(create: (ctx) => Auth()),
           // ChangeNotifierProvider(create: (ctx) => ProductsProvider()), //i have to access token from Auth (upper provider), so user proxyprovider to get access
           ChangeNotifierProxyProvider<Auth, ProductsProvider>(
-            create: (ctx) => ProductsProvider('', []),
+            create: (ctx) => ProductsProvider('', '', []),
             update: (ctx, auth, prevousProducts) => ProductsProvider(
-                auth.token!,
+                auth.token ?? '',
+                auth.userId ?? '',
                 prevousProducts?.items == null ? [] : prevousProducts!.items),
           ),
           ChangeNotifierProvider(create: (ctx) => Cart()),
-          ChangeNotifierProvider.value(
-              value: Orders()), //this provider doest depends on context
+          // ChangeNotifierProvider.value(value: Orders()), //this provider doest depends on context, have to access token so used proxy provider instead
+          ChangeNotifierProxyProvider<Auth, Orders>(
+            create: (ctx) => Orders('', '', []),
+            update: (ctx, auth, previousOrders) => Orders(
+                auth.token ?? '',
+                auth.userId ?? '',
+                previousOrders?.orders == null ? [] : previousOrders!.orders),
+          ),
         ],
         // return ChangeNotifierProvider(
         //   create: (ctx) => ProductsProvider(),
@@ -53,7 +61,15 @@ class MyApp extends StatelessWidget {
                   .copyWith(secondary: Colors.orange),
             ),
             // home: ProductsOverViewScreen(),
-            home: auth.isAuth ? ProductsOverViewScreen() : AuthScreen(),
+            home: auth.isAuth
+                ? ProductsOverViewScreen()
+                : FutureBuilder(
+                    future: auth.tryAutoLogIn(),
+                    builder: (ctx, autoResultSnapshot) =>
+                        autoResultSnapshot.connectionState ==
+                                ConnectionState.waiting
+                            ? SplashScreen()
+                            : AuthScreen()),
             routes: {
               ProductDetailsScreen.routeName: (ctx) =>
                   const ProductDetailsScreen(),
